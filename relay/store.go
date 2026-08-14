@@ -127,12 +127,12 @@ func (s *Store) ListAudit(endpointID, eventID string, limit int) []AuditEntry {
 	}
 	result := make([]AuditEntry, 0, limit)
 	for i := len(s.audit) - 1; i >= 0; i-- {
+		if len(s.audit)-1-i == limit {
+			break
+		}
 		entry := s.audit[i]
 		if (endpointID == "" || entry.EndpointID == endpointID) && (eventID == "" || entry.EventID == eventID) {
 			result = append(result, entry)
-			if len(result) == limit {
-				break
-			}
 		}
 	}
 	return result
