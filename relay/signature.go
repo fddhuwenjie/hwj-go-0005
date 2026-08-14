@@ -1,6 +1,7 @@
 package relay
 
 import (
+	"bytes"
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
@@ -8,7 +9,7 @@ import (
 
 func Sign(secret string, payload []byte) string {
 	h := hmac.New(sha256.New, []byte(secret))
-	_, _ = h.Write(payload)
+	_, _ = h.Write(bytes.TrimSpace(payload))
 	return hex.EncodeToString(h.Sum(nil))
 }
 
