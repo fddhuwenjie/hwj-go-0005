@@ -92,7 +92,7 @@ func (s *Store) MarkDelivery(id, status, detail string, now time.Time) (Event, e
 	event.Status = status
 	event.LastError = detail
 	if status == "pending" {
-		delay := time.Second * time.Duration(1<<(min(event.Attempt+1, 6)-1))
+		delay := time.Second * time.Duration(1<<(min(event.Attempt, 6)-1))
 		event.NextAttemptAt = now.UTC().Add(delay)
 	}
 	s.events[id] = event
