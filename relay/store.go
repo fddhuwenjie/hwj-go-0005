@@ -57,13 +57,13 @@ func (s *Store) EnqueueEvent(endpointID, key string, payload []byte, now time.Ti
 	if key == "" {
 		return Event{}, errors.New("idempotency key is required")
 	}
-	if existingID, exists := s.keys[key]; exists {
+	if existingID, exists := s.keys[endpointID+"\x00"+key]; exists {
 		return s.events[existingID], ErrDuplicateEvent
 	}
 	id := fmt.Sprintf("evt_%06d", len(s.events)+1)
 	event := Event{ID: id, EndpointID: endpointID, IdempotencyKey: key, Payload: append([]byte(nil), payload...), NextAttemptAt: now.UTC(), Status: "pending", CreatedAt: now.UTC()}
 	s.events[id] = event
-	s.keys[key] = id
+	s.keys[endpointID+"\x00"+key] = id
 	s.recordLocked(id, endpointID, "event_queued", "delivery scheduled")
 	return event, nil
 }
