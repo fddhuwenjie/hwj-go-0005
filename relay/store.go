@@ -108,13 +108,22 @@ func (s *Store) ListDeadLetters(endpointID string, limit int) []Event {
 	}
 	result := make([]Event, 0, limit)
 	for _, event := range s.events {
-		if event.Status == "dead" && (endpointID == "" || event.EndpointID == endpointID) {
+		if event.Status == "dead" {
 			result = append(result, event)
 		}
 	}
 	sort.Slice(result, func(i, j int) bool { return result[i].CreatedAt.Before(result[j].CreatedAt) })
 	if len(result) > limit {
 		result = result[:limit]
+	}
+	if endpointID != "" {
+		filtered := result[:0]
+		for _, event := range result {
+			if event.EndpointID == endpointID {
+				filtered = append(filtered, event)
+			}
+		}
+		result = filtered
 	}
 	return result
 }
